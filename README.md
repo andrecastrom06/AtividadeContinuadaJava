@@ -1,4 +1,4 @@
 # AtividadeContinuadaJava\n\n
-## Equipe: \n
-- André Castro;\n
+## Equipe: 
+- André Castro;
 - Lucas Sukar;
