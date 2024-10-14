@@ -57,7 +57,7 @@ public class MediatorEntidadeOperadora {
 	private static MediatorEntidadeOperadora instanciaSingleton = new MediatorEntidadeOperadora();
     private final RepositorioEntidadeOperadora repositorioEntidadeOperadora = new RepositorioEntidadeOperadora();
     private MediatorEntidadeOperadora() { }
-    public static MediatorEntidadeOperadora getInstancia() {
+    public static MediatorEntidadeOperadora getInstanciaSingleton() {
         return instanciaSingleton;
     }
     private String validar(EntidadeOperadora entidadeOperadora) {
@@ -70,9 +70,15 @@ public class MediatorEntidadeOperadora {
         if (entidadeOperadora.getNome().length() < 10 || entidadeOperadora.getNome().length() > 100) {
             return "Nome deve ter entre 10 e 100 caracteres.";
         }
-        //private boolean autorizadoAcao;
-    	//private double saldoAcao;
-    	//private double saldoTituloDivida;
+        if (entidadeOperadora.getAutorizadoAcao() == false) {
+            return "A ação deve ser autorizada";
+        }
+        if (entidadeOperadora.getSaldoAcao() < 0) {
+            return "Erro o saldo da ação deve ser maior que ou igual a 0";
+        }
+        if (entidadeOperadora.getSaldoTituloDivida() < 0) {
+            return "Erro o saldo do titulo da divida deve ser maior que ou igual a 0";
+        }
         return null;
     }
     public String incluir(EntidadeOperadora entidade) {
