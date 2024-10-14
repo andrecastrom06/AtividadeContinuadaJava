@@ -106,19 +106,11 @@ public class RepositorioTransacao {
             while ((linha = reader.readLine()) != null) {
                 String[] partes = linha.split(";");
                 if (Integer.parseInt(partes[0]) == identificadorEntidadeCredito) {
-                    
                     EntidadeOperadora entidadeCredito = new EntidadeOperadora(
                         Integer.parseInt(partes[0]), 
                         partes[1],                 
                         Boolean.parseBoolean(partes[3])  
                     );
-
-                    EntidadeOperadora entidadeDebito = new EntidadeOperadora(
-                        Integer.parseInt(partes[5]), 
-                        partes[6],                  
-                        Boolean.parseBoolean(partes[8]) 
-                    );
-
                     Acao acao = null;
                     if (!partes[10].equals("null")) {
                         acao = new Acao(
@@ -141,6 +133,55 @@ public class RepositorioTransacao {
                     
                     Transacao transacao = new Transacao(
                         entidadeCredito,
+                        null,
+                        acao,
+                        tituloDivida,
+                        Double.parseDouble(partes[18]),
+                        LocalDateTime.parse(partes[19])
+                    );
+                    transacoesEncontradas.add(transacao);
+                }
+            }   
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return transacoesEncontradas.toArray(new Transacao[0]);
+    }
+    public Transacao[] buscarPorEntidadeDevedora(int identificadorEntidadeDebito) {
+        List<Transacao> transacoesEncontradas = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("Transacao.txt"));
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] partes = linha.split(";");
+                if (Integer.parseInt(partes[0]) == identificadorEntidadeDebito) {
+                	EntidadeOperadora entidadeDebito = new EntidadeOperadora(
+                        Integer.parseInt(partes[5]), 
+                        partes[6],                  
+                        Boolean.parseBoolean(partes[8]) 
+                    );
+                    Acao acao = null;
+                    if (!partes[10].equals("null")) {
+                        acao = new Acao(
+                            Integer.parseInt(partes[10]), 
+                            partes[11],                   
+                            LocalDate.parse(partes[12]), 
+                            Double.parseDouble(partes[13])
+                        );
+                    }
+                    TituloDivida tituloDivida = null;
+                    if (!partes[14].equals("null")) {
+                        tituloDivida = new TituloDivida(
+                            Integer.parseInt(partes[14]),
+                            partes[15],
+                            LocalDate.parse(partes[16]),
+                            Double.parseDouble(partes[17])
+                        );
+                    }
+                    
+                    Transacao transacao = new Transacao(
+                    	null,
                         entidadeDebito,
                         acao,
                         tituloDivida,
