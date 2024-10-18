@@ -1,107 +1,92 @@
 package org.cesarschool.telas;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.wb.swt.SWTResourceManager;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class TelaAdicao {
 
-	protected Shell shlTelaAdio;
-	private Text txtPrimeiroNumero;
-	private Text txtSegundoNUmero;
-	private Text txtResultado;
+    private JFrame frame;
+    private JTextField txtPrimeiroNumero;
+    private JTextField txtSegundoNumero;
+    private JTextField txtResultado;
 
-	/**
-	 * Launch the application.
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		try {
-			TelaAdicao window = new TelaAdicao();
-			window.open();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        EventQueue.invokeLater(() -> {
+            try {
+                TelaAdicao window = new TelaAdicao();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
 
-	/**
-	 * Open the window.
-	 */
-	public void open() {
-		Display display = Display.getDefault();
-		createContents();
-		shlTelaAdio.open();
-		shlTelaAdio.layout();
-		while (!shlTelaAdio.isDisposed()) {
-			if (!display.readAndDispatch()) {
-				display.sleep();
-			}
-		}
-	}
+    public TelaAdicao() {
+        initialize();
+    }
 
-	/**
-	 * Create contents of the window.
-	 */
-	protected void createContents() {
-		shlTelaAdio = new Shell();
-		shlTelaAdio.setImage(SWTResourceManager.getImage("C:\\Users\\eduar\\OneDrive\\Imagens\\742328.jpg"));
-		shlTelaAdio.setSize(556, 330);
-		shlTelaAdio.setText("Tela adi\u00E7\u00E3o");
-		
-		Label lblPrimeiroNmero = new Label(shlTelaAdio, SWT.NONE);
-		lblPrimeiroNmero.setBounds(41, 40, 121, 20);
-		lblPrimeiroNmero.setText("Primeiro n\u00FAmero");
-		
-		Label lblNewLabel = new Label(shlTelaAdio, SWT.NONE);
-		lblNewLabel.setBounds(41, 102, 121, 20);
-		lblNewLabel.setText("Segundo n\u00FAmero");
-		
-		txtPrimeiroNumero = new Text(shlTelaAdio, SWT.BORDER);
-		txtPrimeiroNumero.setBounds(183, 40, 78, 26);
-		
-		txtSegundoNUmero = new Text(shlTelaAdio, SWT.BORDER);
-		txtSegundoNUmero.setBounds(183, 102, 78, 26);
-		
-		Label lblResultado = new Label(shlTelaAdio, SWT.NONE);
-		lblResultado.setBounds(41, 163, 70, 20);
-		lblResultado.setText("Resultado");
-		
-		txtResultado = new Text(shlTelaAdio, SWT.BORDER);
-		txtResultado.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
-		txtResultado.setEnabled(false);
-		txtResultado.setEditable(false);
-		txtResultado.setBounds(183, 163, 78, 37);
-		
-		Button btnSomar = new Button(shlTelaAdio, SWT.NONE);
-		btnSomar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				double n1 = Double.parseDouble(txtPrimeiroNumero.getText());
-				double n2 = Double.parseDouble(txtSegundoNUmero.getText()); 
-				double soma = n1 + n2;
-				txtResultado.setText("" + soma);	
-			}
-		});
-		btnSomar.setBounds(130, 220, 90, 30);
-		btnSomar.setText("Somar");
-		
-		Button btnLimpar = new Button(shlTelaAdio, SWT.NONE);
-		btnLimpar.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				txtPrimeiroNumero.setText("");
-				txtSegundoNUmero.setText("");
-				txtResultado.setText("");
-			}
-		});
-		btnLimpar.setBounds(254, 220, 90, 30);
-		btnLimpar.setText("Limpar");
+    private void initialize() {
+        frame = new JFrame("Calculadora de Adição");
+        frame.setBounds(100, 100, 400, 300);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new GridLayout(4, 2, 10, 10));
+        frame.getContentPane().setBackground(new Color(200, 220, 240)); 
+        
+        JLabel lblPrimeiroNumero = new JLabel("Primeiro número:");
+        frame.getContentPane().add(lblPrimeiroNumero);
 
-	}
+        txtPrimeiroNumero = new JTextField();
+        frame.getContentPane().add(txtPrimeiroNumero);
+        txtPrimeiroNumero.setColumns(10);
+
+        JLabel lblSegundoNumero = new JLabel("Segundo número:");
+        frame.getContentPane().add(lblSegundoNumero);
+
+        txtSegundoNumero = new JTextField();
+        frame.getContentPane().add(txtSegundoNumero);
+        txtSegundoNumero.setColumns(10);
+
+        JLabel lblResultado = new JLabel("Resultado:");
+        frame.getContentPane().add(lblResultado);
+
+        txtResultado = new JTextField();
+        txtResultado.setEditable(false);
+        frame.getContentPane().add(txtResultado);
+        txtResultado.setColumns(10);
+        txtResultado.setBackground(new Color(220, 220, 220)); 
+
+        JButton btnSomar = new JButton("Somar");
+        btnSomar.setBackground(new Color(50, 150, 50)); 
+        btnSomar.setForeground(Color.WHITE); 
+        btnSomar.setFocusPainted(false);
+        btnSomar.setPreferredSize(new Dimension(80, 30)); 
+        btnSomar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    double n1 = Double.parseDouble(txtPrimeiroNumero.getText());
+                    double n2 = Double.parseDouble(txtSegundoNumero.getText());
+                    double soma = n1 + n2;
+                    txtResultado.setText(String.valueOf(soma));
+                } catch (NumberFormatException ex) {
+                    txtResultado.setText("Erro");
+                }
+            }
+        });
+        frame.getContentPane().add(btnSomar);
+        JButton btnLimpar = new JButton("Limpar");
+        btnLimpar.setBackground(new Color(220, 50, 50)); 
+        btnLimpar.setForeground(Color.WHITE); 
+        btnLimpar.setFocusPainted(false);
+        btnLimpar.setPreferredSize(new Dimension(80, 30));
+        btnLimpar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                txtPrimeiroNumero.setText("");
+                txtSegundoNumero.setText("");
+                txtResultado.setText("");
+            }
+        });
+        frame.getContentPane().add(btnLimpar);
+    }
 }
