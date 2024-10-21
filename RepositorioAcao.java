@@ -33,27 +33,21 @@ import java.time.LocalDate;
  */
 
 public class RepositorioAcao {
-    
     public boolean incluir(Acao acao) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("Acao.txt"));
-            String linha;
-            while ((linha = reader.readLine()) != null) {
-                String[] dados = linha.split(";");
-                if (Integer.parseInt(dados[0]) == acao.getIdentificador()) {
-                    reader.close();
-                    return false;
-                }
-            }
-            reader.close();
             PrintWriter pw = new PrintWriter(new FileWriter("Acao.txt", true));
-            pw.println(acao.getIdentificador() + ";" + acao.getNome() + ";" + acao.getDataDeValidade() + ";" + acao.getValorUnitario());
+            if (buscar(acao.getIdentificador()) != null) {
+                pw.close();
+                return false;
+            }
+            pw.println(acao.getIdentificador() + ";" + acao.getNome() + ";" +
+                       acao.getDataDeValidade() + ";" + acao.getValorUnitario());
             pw.close();
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
     public boolean alterar(Acao acao) {
@@ -65,7 +59,8 @@ public class RepositorioAcao {
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
                 if (Integer.parseInt(dados[0]) == acao.getIdentificador()) {
-                    linha = acao.getIdentificador() + ";" + acao.getNome() + ";" + acao.getDataDeValidade() + ";" + acao.getValorUnitario();
+                    linha = acao.getIdentificador() + ";" + acao.getNome() + ";" +
+                            acao.getDataDeValidade() + ";" + acao.getValorUnitario();
                     identificadorEncontrado = true;
                 }
                 conteudo.append(linha).append("\n");
@@ -93,7 +88,7 @@ public class RepositorioAcao {
                 String[] dados = linha.split(";");
                 if (Integer.parseInt(dados[0]) == identificador) {
                     identificadorEncontrado = true;
-                    continue;
+                    continue; 
                 }
                 conteudo.append(linha).append("\n");
             }
