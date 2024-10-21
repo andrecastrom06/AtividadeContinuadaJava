@@ -5,107 +5,164 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
-import br.com.cesarschool.poo.titulos.entidades.EntidadeOperadora;
+import br.com.cesarschool.poo.titulos.mediators.MediatorOperacao;
 import br.com.cesarschool.poo.titulos.entidades.Transacao;
-import br.com.cesarschool.poo.titulos.repositorios.RepositorioTransacao;
-import java.time.LocalDateTime;
 
-public class TelaTransacao extends JFrame implements Serializable {
+public class TelaOperacao extends JFrame implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private JTextField txtEntidadeCredito, txtEntidadeDebito, txtValorOperacao, txtDataHora;
-    private RepositorioTransacao repositorio = new RepositorioTransacao();
+    private JTextField txtEntidadeCredito, txtEntidadeDebito, txtAcaoOuTitulo, txtValor;
+    private JCheckBox checkEhAcao;
+    private MediatorOperacao mediator = MediatorOperacao.getInstancia();
 
-    public TelaTransacao() {
-        setTitle("Gestão de Transações");
-        setSize(400, 250);
+    public TelaOperacao() {
+        setTitle("Gestão de Operações");
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(6, 2));
+        setLocationRelativeTo(null);
 
-        add(new JLabel("Entidade Credora ID:"));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.BLACK);
+
+        JLabel lblEntidadeCredito = new JLabel("Entidade Credora ID:", SwingConstants.CENTER);
         txtEntidadeCredito = new JTextField();
-        add(txtEntidadeCredito);
-
-        add(new JLabel("Entidade Devedora ID:"));
+        JLabel lblEntidadeDebito = new JLabel("Entidade Devedora ID:", SwingConstants.CENTER);
         txtEntidadeDebito = new JTextField();
-        add(txtEntidadeDebito);
+        JLabel lblAcaoOuTitulo = new JLabel("ID Ação/Título:", SwingConstants.CENTER);
+        txtAcaoOuTitulo = new JTextField();
+        JLabel lblValor = new JLabel("Valor da Operação:", SwingConstants.CENTER);
+        txtValor = new JTextField();
+        JLabel lblEhAcao = new JLabel("É Ação?", SwingConstants.CENTER);
+        checkEhAcao = new JCheckBox();
 
-        add(new JLabel("Valor da Operação:"));
-        txtValorOperacao = new JTextField();
-        add(txtValorOperacao);
-
-        add(new JLabel("Data e Hora da Operação (AAAA-MM-DDTHH:MM):"));
-        txtDataHora = new JTextField();
-        add(txtDataHora);
-
-        JButton btnIncluir = new JButton("Incluir");
-        JButton btnBuscar = new JButton("Buscar por Credor");
+        Font labelFont = new Font("Arial", Font.BOLD, 18);
+        lblEntidadeCredito.setFont(labelFont);
+        lblEntidadeDebito.setFont(labelFont);
+        lblAcaoOuTitulo.setFont(labelFont);
+        lblValor.setFont(labelFont);
+        lblEhAcao.setFont(labelFont);
+        lblEntidadeCredito.setForeground(Color.WHITE);
+        lblEntidadeDebito.setForeground(Color.WHITE);
+        lblAcaoOuTitulo.setForeground(Color.WHITE);
+        lblValor.setForeground(Color.WHITE);
+        lblEhAcao.setForeground(Color.WHITE);
+        
+        JButton btnRealizarOperacao = new JButton("Realizar Operação");
+        JButton btnGerarExtrato = new JButton("Gerar Extrato");
         JButton btnVoltar = new JButton("Voltar");
 
-        add(btnIncluir);
-        add(btnBuscar);
-        add(btnVoltar);
+        Color azul = new Color(30, 144, 255);
+        Color branco = Color.WHITE;
+        configurarBotao(btnRealizarOperacao, azul, branco);
+        configurarBotao(btnGerarExtrato, azul, branco);
+        configurarBotao(btnVoltar, azul, branco);
 
-        btnIncluir.addActionListener(new ActionListener() {
+        panel.add(Box.createVerticalStrut(50));
+        panel.add(lblEntidadeCredito);
+        panel.add(txtEntidadeCredito);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(lblEntidadeDebito);
+        panel.add(txtEntidadeDebito);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(lblAcaoOuTitulo);
+        panel.add(txtAcaoOuTitulo);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(lblValor);
+        panel.add(txtValor);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(lblEhAcao);
+        panel.add(checkEhAcao);
+        panel.add(Box.createVerticalStrut(30));
+        panel.add(btnRealizarOperacao);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(btnGerarExtrato);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(btnVoltar);
+        panel.add(Box.createVerticalStrut(50));
+
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 300, 50, 300));
+        add(panel);
+        setVisible(true);
+
+        btnRealizarOperacao.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                incluirTransacao();
+                realizarOperacao();
             }
         });
 
-        btnBuscar.addActionListener(new ActionListener() {
+        btnGerarExtrato.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                buscarTransacaoPorCredor();
+                gerarExtrato();
             }
         });
-        
+
         btnVoltar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TelaMenu mainScreen = new TelaMenu();
                 mainScreen.setVisible(true);
-                dispose(); 
+                dispose();
             }
         });
     }
 
-    private void incluirTransacao() {
-        int idCredito = Integer.parseInt(txtEntidadeCredito.getText());
-        int idDebito = Integer.parseInt(txtEntidadeDebito.getText());
-        double valorOperacao = Double.parseDouble(txtValorOperacao.getText());
-        LocalDateTime dataHora = LocalDateTime.parse(txtDataHora.getText());
-        
-        EntidadeOperadora entidadeCredito = new EntidadeOperadora(idCredito, "Credor", true, 1000.0, 200.0);
-        EntidadeOperadora entidadeDebito = new EntidadeOperadora(idDebito, "Devedor", true, 800.0, 100.0);
-        
-        Transacao transacao = new Transacao(entidadeCredito, entidadeDebito, null, null, valorOperacao, dataHora);
-        if (repositorio.incluir(transacao)) {
-            JOptionPane.showMessageDialog(this, "Transação incluída com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Erro ao incluir transação.");
+    private void configurarBotao(JButton botao, Color bgColor, Color fgColor) {
+        botao.setBackground(bgColor);
+        botao.setForeground(fgColor);
+        botao.setFocusPainted(false);
+        botao.setFont(new Font("Arial", Font.PLAIN, 24));
+        botao.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botao.setMaximumSize(new Dimension(500, 60));
+    }
+
+    private void realizarOperacao() {
+        try {
+            int idCredito = Integer.parseInt(txtEntidadeCredito.getText());
+            int idDebito = Integer.parseInt(txtEntidadeDebito.getText());
+            int idAcaoOuTitulo = Integer.parseInt(txtAcaoOuTitulo.getText());
+            double valorOperacao = Double.parseDouble(txtValor.getText());
+            boolean ehAcao = checkEhAcao.isSelected();
+
+            String resultado = mediator.realizarOperacao(ehAcao, idCredito, idDebito, idAcaoOuTitulo, valorOperacao);
+            JOptionPane.showMessageDialog(this, resultado);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: IDs e valor da operação devem ser numéricos.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao processar a operação: " + ex.getMessage());
         }
     }
 
-    private void buscarTransacaoPorCredor() {
-        int idCredito = Integer.parseInt(txtEntidadeCredito.getText());
-        Transacao[] transacoes = repositorio.buscarPorEntidadeCredora(idCredito);
-        
-        if (transacoes.length > 0) {
-            StringBuilder resultado = new StringBuilder();
-            for (Transacao transacao : transacoes) {
-                resultado.append("Valor: ").append(transacao.getValorOperacao())
-                          .append(", Data/Hora: ").append(transacao.getDataHoraOperacao()).append("\n");
+    private void gerarExtrato() {
+        try {
+            int idEntidade = Integer.parseInt(txtEntidadeCredito.getText());
+            Transacao[] extrato = mediator.gerarExtrato(idEntidade);
+
+            if (extrato != null && extrato.length > 0) {
+                StringBuilder resultado = new StringBuilder();
+                for (Transacao transacao : extrato) {
+                    resultado.append("Entidade Débito: ")
+                             .append(transacao.getEntidadeDebito().getIdentificador())
+                             .append(", Valor: ").append(transacao.getValorOperacao())
+                             .append(", Data/Hora: ").append(transacao.getDataHoraOperacao())
+                             .append("\n");
+                }
+                JOptionPane.showMessageDialog(this, resultado.toString());
+            } else {
+                JOptionPane.showMessageDialog(this, "Nenhuma transação encontrada.");
             }
-            JOptionPane.showMessageDialog(this, resultado.toString());
-        } else {
-            JOptionPane.showMessageDialog(this, "Nenhuma transação encontrada.");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: ID da entidade deve ser numérico.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Erro ao gerar extrato: " + ex.getMessage());
         }
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new TelaTransacao().setVisible(true);
+            new TelaOperacao().setVisible(true);
         });
     }
 }
