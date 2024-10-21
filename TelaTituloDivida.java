@@ -6,47 +6,60 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.Serializable;
 import br.com.cesarschool.poo.titulos.entidades.TituloDivida;
-import br.com.cesarschool.poo.titulos.repositorios.RepositorioTituloDivida;
+import br.com.cesarschool.poo.titulos.mediators.MediatorTituloDivida;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 public class TelaTituloDivida extends JFrame implements Serializable {
     private static final long serialVersionUID = 1L;
+
     private JTextField txtId, txtNome, txtDataValidade, txtTaxaJuros;
-    private RepositorioTituloDivida repositorio = new RepositorioTituloDivida();
+    private MediatorTituloDivida mediator = MediatorTituloDivida.getInstanciaSingleton();
 
     public TelaTituloDivida() {
         setTitle("Gestão de Títulos de Dívida");
-        setSize(400, 300);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(6, 2));
+        setLocationRelativeTo(null);
 
-        add(new JLabel("ID:"));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.BLACK);
+
+        JLabel lblTitulo = new JLabel("Gestão de Títulos de Dívida", SwingConstants.CENTER);
+        lblTitulo.setForeground(Color.WHITE);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 48));
+
+        JLabel lblId = new JLabel("Identificador:");
+        lblId.setForeground(Color.WHITE);
         txtId = new JTextField();
-        add(txtId);
 
-        add(new JLabel("Nome:"));
+        JLabel lblNome = new JLabel("Nome:");
+        lblNome.setForeground(Color.WHITE);
         txtNome = new JTextField();
-        add(txtNome);
 
-        add(new JLabel("Data Validade (AAAA-MM-DD):"));
+        JLabel lblDataValidade = new JLabel("Data Validade (AAAA-MM-DD):");
+        lblDataValidade.setForeground(Color.WHITE);
         txtDataValidade = new JTextField();
-        add(txtDataValidade);
 
-        add(new JLabel("Taxa de Juros:"));
+        JLabel lblTaxaJuros = new JLabel("Taxa de Juros:");
+        lblTaxaJuros.setForeground(Color.WHITE);
         txtTaxaJuros = new JTextField();
-        add(txtTaxaJuros);
 
         JButton btnIncluir = new JButton("Incluir");
         JButton btnAlterar = new JButton("Alterar");
         JButton btnExcluir = new JButton("Excluir");
         JButton btnBuscar = new JButton("Buscar");
         JButton btnVoltar = new JButton("Voltar");
-        
-        add(btnIncluir);
-        add(btnAlterar);
-        add(btnExcluir);
-        add(btnBuscar);
-        add(btnVoltar);
+
+        Color azul = new Color(30, 144, 255);
+        Color branco = Color.WHITE;
+
+        configurarBotao(btnIncluir, azul, branco);
+        configurarBotao(btnAlterar, azul, branco);
+        configurarBotao(btnExcluir, azul, branco);
+        configurarBotao(btnBuscar, azul, branco);
+        configurarBotao(btnVoltar, azul, branco);
 
         btnIncluir.addActionListener(new ActionListener() {
             @Override
@@ -75,65 +88,135 @@ public class TelaTituloDivida extends JFrame implements Serializable {
                 buscarTitulo();
             }
         });
-        
+
         btnVoltar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TelaMenu mainScreen = new TelaMenu();
                 mainScreen.setVisible(true);
-                dispose(); 
+                dispose();
             }
         });
+
+        panel.add(Box.createVerticalStrut(50));
+        panel.add(lblTitulo);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(lblId);
+        panel.add(txtId);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(lblNome);
+        panel.add(txtNome);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(lblDataValidade);
+        panel.add(txtDataValidade);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(lblTaxaJuros);
+        panel.add(txtTaxaJuros);
+        panel.add(Box.createVerticalStrut(20));
+        panel.add(btnIncluir);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnAlterar);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnExcluir);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnBuscar);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(btnVoltar);
+
+        panel.setBorder(BorderFactory.createEmptyBorder(50, 300, 50, 300));
+        add(panel);
+    }
+
+    private void configurarBotao(JButton botao, Color bgColor, Color fgColor) {
+        botao.setBackground(bgColor);
+        botao.setForeground(fgColor);
+        botao.setFocusPainted(false);
+        botao.setFont(new Font("Arial", Font.PLAIN, 24));
+        botao.setAlignmentX(Component.CENTER_ALIGNMENT);
+        botao.setMaximumSize(new Dimension(500, 60));
     }
 
     private void incluirTitulo() {
-        int id = Integer.parseInt(txtId.getText());
-        String nome = txtNome.getText();
-        LocalDate dataValidade = LocalDate.parse(txtDataValidade.getText());
-        double taxaJuros = Double.parseDouble(txtTaxaJuros.getText());
-        
-        TituloDivida titulo = new TituloDivida(id, nome, dataValidade, taxaJuros);
-        if (repositorio.incluir(titulo)) {
-            JOptionPane.showMessageDialog(this, "Título incluído com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Erro ao incluir título ou identificador já existe.");
+        try {
+            int id = Integer.parseInt(txtId.getText());
+            String nome = txtNome.getText();
+            LocalDate dataValidade = LocalDate.parse(txtDataValidade.getText());
+            double taxaJuros = Double.parseDouble(txtTaxaJuros.getText());
+
+            TituloDivida titulo = new TituloDivida(id, nome, dataValidade, taxaJuros);
+            String resultado = mediator.incluir(titulo);
+
+            if (resultado == null) {
+                JOptionPane.showMessageDialog(this, "Título incluído com sucesso!");
+                limparCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, resultado);
+            }
+        } catch (NumberFormatException | DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: Verifique os valores numéricos e o formato da data.");
         }
     }
 
     private void alterarTitulo() {
-        int id = Integer.parseInt(txtId.getText());
-        String nome = txtNome.getText();
-        LocalDate dataValidade = LocalDate.parse(txtDataValidade.getText());
-        double taxaJuros = Double.parseDouble(txtTaxaJuros.getText());
-        
-        TituloDivida titulo = new TituloDivida(id, nome, dataValidade, taxaJuros);
-        if (repositorio.alterar(titulo)) {
-            JOptionPane.showMessageDialog(this, "Título alterado com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Erro ao alterar título ou identificador não encontrado.");
+        try {
+            int id = Integer.parseInt(txtId.getText());
+            String nome = txtNome.getText();
+            LocalDate dataValidade = LocalDate.parse(txtDataValidade.getText());
+            double taxaJuros = Double.parseDouble(txtTaxaJuros.getText());
+
+            TituloDivida titulo = new TituloDivida(id, nome, dataValidade, taxaJuros);
+            String resultado = mediator.alterar(titulo);
+
+            if (resultado == null) {
+                JOptionPane.showMessageDialog(this, "Título alterado com sucesso!");
+                limparCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, resultado);
+            }
+        } catch (NumberFormatException | DateTimeParseException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: Verifique os valores numéricos e o formato da data.");
         }
     }
 
     private void excluirTitulo() {
-        int id = Integer.parseInt(txtId.getText());
-        if (repositorio.excluir(id)) {
-            JOptionPane.showMessageDialog(this, "Título excluído com sucesso!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Erro ao excluir título ou identificador não encontrado.");
+        try {
+            int id = Integer.parseInt(txtId.getText());
+            String resultado = mediator.excluir(id);
+
+            if (resultado == null) {
+                JOptionPane.showMessageDialog(this, "Título excluído com sucesso!");
+                limparCampos();
+            } else {
+                JOptionPane.showMessageDialog(this, resultado);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: O ID deve ser numérico.");
         }
     }
 
     private void buscarTitulo() {
-        int id = Integer.parseInt(txtId.getText());
-        TituloDivida titulo = repositorio.buscar(id);
-        if (titulo != null) {
-            txtNome.setText(titulo.getNome());
-            txtDataValidade.setText(titulo.getDataDeValidade().toString());
-            txtTaxaJuros.setText(String.valueOf(titulo.getTaxaJuros()));
-            JOptionPane.showMessageDialog(this, "Título encontrado!");
-        } else {
-            JOptionPane.showMessageDialog(this, "Título não encontrado.");
+        try {
+            int id = Integer.parseInt(txtId.getText());
+            TituloDivida titulo = mediator.buscar(id);
+
+            if (titulo != null) {
+                txtNome.setText(titulo.getNome());
+                txtDataValidade.setText(titulo.getDataDeValidade().toString());
+                txtTaxaJuros.setText(String.valueOf(titulo.getTaxaJuros()));
+                JOptionPane.showMessageDialog(this, "Título encontrado!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Título não encontrado.");
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Erro: O ID deve ser numérico.");
         }
+    }
+
+    private void limparCampos() {
+        txtId.setText("");
+        txtNome.setText("");
+        txtDataValidade.setText("");
+        txtTaxaJuros.setText("");
     }
 
     public static void main(String[] args) {
