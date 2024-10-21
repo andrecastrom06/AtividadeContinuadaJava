@@ -29,7 +29,7 @@ public class TelaMenu extends JFrame implements Serializable {
         JButton btnAcao = new JButton("Tela de Ação");
         JButton btnEntidadeOperadora = new JButton("Tela de Entidade Operadora");
         JButton btnTituloDivida = new JButton("Tela de Titulo Divida");
-        JButton btnTransacao = new JButton("Tela de Transacao");
+        JButton btnOperacao = new JButton("Tela de Operação");
 
         Color azul = new Color(30, 144, 255);
         Color branco = Color.WHITE;
@@ -37,7 +37,7 @@ public class TelaMenu extends JFrame implements Serializable {
         configurarBotao(btnAcao, azul, branco);
         configurarBotao(btnEntidadeOperadora, azul, branco);
         configurarBotao(btnTituloDivida, azul, branco);
-        configurarBotao(btnTransacao, azul, branco);
+        configurarBotao(btnOperacao, azul, branco);
 
         btnAcao.addActionListener(new ActionListener() {
             @Override
@@ -66,7 +66,7 @@ public class TelaMenu extends JFrame implements Serializable {
             }
         });
 
-        btnTransacao.addActionListener(new ActionListener() {
+        btnOperacao.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TelaTransacao acaoScreen = new TelaTransacao();
@@ -86,7 +86,7 @@ public class TelaMenu extends JFrame implements Serializable {
         panel.add(Box.createVerticalStrut(20));
         panel.add(btnTituloDivida);
         panel.add(Box.createVerticalStrut(20));
-        panel.add(btnTransacao);
+        panel.add(btnOperacao);
 
         panel.setBorder(BorderFactory.createEmptyBorder(50, 300, 50, 300));
         add(panel);
