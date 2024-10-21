@@ -14,10 +14,12 @@ public class EntidadeOperadora {
 	private double saldoAcao;
 	private double saldoTituloDivida;
 	
-	public EntidadeOperadora(long identificador, String nome, boolean autorizadoAcao) {
+	public EntidadeOperadora(long identificador, String nome, boolean autorizadoAcao, double saldoAcao, double saldoTituloDivida) {
 		this.identificador = identificador;
 		this.nome = nome;
 		this.autorizadoAcao = autorizadoAcao;
+		this.saldoAcao = saldoAcao;
+		this.saldoTituloDivida = saldoTituloDivida;
 	}
 	
 	public long getIdentificador() {
